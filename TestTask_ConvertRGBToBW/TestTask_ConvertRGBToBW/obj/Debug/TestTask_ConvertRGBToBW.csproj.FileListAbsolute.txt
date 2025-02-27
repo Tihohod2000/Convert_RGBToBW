@@ -1,0 +1,10 @@
+E:\Работа\Convert_RGBToBW\TestTask_ConvertRGBToBW\TestTask_ConvertRGBToBW\bin\Debug\TestTask_ConvertRGBToBW.exe.config
+E:\Работа\Convert_RGBToBW\TestTask_ConvertRGBToBW\TestTask_ConvertRGBToBW\bin\Debug\TestTask_ConvertRGBToBW.exe
+E:\Работа\Convert_RGBToBW\TestTask_ConvertRGBToBW\TestTask_ConvertRGBToBW\bin\Debug\TestTask_ConvertRGBToBW.pdb
+E:\Работа\Convert_RGBToBW\TestTask_ConvertRGBToBW\TestTask_ConvertRGBToBW\obj\Debug\TestTask_ConvertRGBToBW.csproj.AssemblyReference.cache
+E:\Работа\Convert_RGBToBW\TestTask_ConvertRGBToBW\TestTask_ConvertRGBToBW\obj\Debug\TestTask_ConvertRGBToBW.Form1.resources
+E:\Работа\Convert_RGBToBW\TestTask_ConvertRGBToBW\TestTask_ConvertRGBToBW\obj\Debug\TestTask_ConvertRGBToBW.Properties.Resources.resources
+E:\Работа\Convert_RGBToBW\TestTask_ConvertRGBToBW\TestTask_ConvertRGBToBW\obj\Debug\TestTask_ConvertRGBToBW.csproj.GenerateResource.cache
+E:\Работа\Convert_RGBToBW\TestTask_ConvertRGBToBW\TestTask_ConvertRGBToBW\obj\Debug\TestTask_ConvertRGBToBW.csproj.CoreCompileInputs.cache
+E:\Работа\Convert_RGBToBW\TestTask_ConvertRGBToBW\TestTask_ConvertRGBToBW\obj\Debug\TestTask_ConvertRGBToBW.exe
+E:\Работа\Convert_RGBToBW\TestTask_ConvertRGBToBW\TestTask_ConvertRGBToBW\obj\Debug\TestTask_ConvertRGBToBW.pdb
