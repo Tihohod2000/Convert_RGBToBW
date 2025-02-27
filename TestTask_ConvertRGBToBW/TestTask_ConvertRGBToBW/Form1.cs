@@ -18,7 +18,7 @@ namespace TestTask_ConvertRGBToBW
             InitializeComponent();
         }
 
-        public string selectedFilePath;
+        public string ImagePath;
 
         public Bitmap inputImage;
         OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -31,18 +31,11 @@ namespace TestTask_ConvertRGBToBW
             // Проверяем, выбрал ли пользователь файл
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                // Получаем путь к выбранному файлу
-                selectedFilePath = openFileDialog.FileName;
+                ImagePath = openFileDialog.FileName;
 
-                //Загружаем изображение
-                inputImage = new Bitmap(selectedFilePath);
+                inputImage = new Bitmap(ImagePath);;
 
-                // Например, выводим путь в текстовое поле
-                // MessageBox.Show("Вы выбрали файл: " + selectedFilePath);
-
-                // Загрузка изображения в PictureBox
-                pictureInput.Image = Image.FromFile(selectedFilePath);
-
+                pictureInput.Image = Image.FromFile(ImagePath);
                 pictureInput.SizeMode = PictureBoxSizeMode.Zoom;
             }
         }
@@ -50,31 +43,55 @@ namespace TestTask_ConvertRGBToBW
         private async void button1_Click(object sender, EventArgs e)
         {
             // Проверяем, выбрал ли пользователь файл
-            if (!string.IsNullOrEmpty(selectedFilePath))
+            if (!string.IsNullOrEmpty(ImagePath))
             {
-                ImageRGBToBW converter = new ImageRGBToBW(selectedFilePath);
-                /*converter.ConvertAndSave(inputImage);*/
 
-                Bitmap bwImage = await converter.ConvertAndSaveAsync(inputImage, progressBar1);
-                Console.WriteLine("Конец");
+                try
+                {
+                    ImageRGBToBW converter = new ImageRGBToBW(ImagePath);
+                    /*converter.ConvertAndSave(inputImage);*/
 
-                pictureOutput.Image = bwImage;
+                    converter.ProgressChanged += (s, progress) =>
+                    {
+                        // Используем Invoke
+                        if (progressBar1.InvokeRequired)
+                        {
+                            progressBar1.Invoke(new Action<int>((p) => progressBar1.Value = p), progress);
+                        }
+                        else
+                        {
+                            progressBar1.Value = progress;
+                        }
+                    };
+                    Bitmap bwImage = await converter.ConvertAndSaveAsync(inputImage);
+                    Console.WriteLine("Конец");
 
-                pictureOutput.SizeMode = PictureBoxSizeMode.Zoom;
+                    pictureOutput.Image = bwImage;
+                    pictureOutput.SizeMode = PictureBoxSizeMode.Zoom;
 
-                /*MessageBox.Show("Готово!");*/
+
+                }
+                catch (Exception ex)
+                {
+
+                    Console.WriteLine($"Ошибка: {ex.Message}");
+                    MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+
+
+
+                MessageBox.Show("Готово!");
             }
             else
             {
                 MessageBox.Show("Выберите изображение!!!");
             }
+        }
 
-            
-
-            /*pictureOutput.Image = Image.FromFile(selectedFilePath);
-
-            pictureOutput.SizeMode = PictureBoxSizeMode.Zoom;*/
-
+        private void ExitApp(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

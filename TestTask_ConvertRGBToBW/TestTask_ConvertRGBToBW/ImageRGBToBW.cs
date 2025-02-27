@@ -19,13 +19,15 @@ namespace TestTask_ConvertRGBToBW
 
         private const byte Threshold = 128; // Порог
 
+        public event EventHandler<int> ProgressChanged;
+
         public ImageRGBToBW(string link, string nameOut = "output.png")
         {
             Link = link;
             NameOut = nameOut;
         }
 
-        public Bitmap Convert(Bitmap image, IProgress<int> progress)
+        public Bitmap Convert(Bitmap image)
         {
             if (image == null)
                 throw new ArgumentNullException(nameof(image), "Изображение не может быть null");
@@ -50,6 +52,7 @@ namespace TestTask_ConvertRGBToBW
             int pixelSize = (format == PixelFormat.Format24bppRgb) ? 3 : 4; // 3 байта (BGR) или 4 (BGRA)
             int totalPixels = pixelBuffer.Length / pixelSize;
 
+
             for (int i = 0; i < pixelBuffer.Length; i += pixelSize)
             {
                 // Вычисляем яркость 
@@ -63,16 +66,18 @@ namespace TestTask_ConvertRGBToBW
                 pixelBuffer[i + 2] = binaryValue; // Red
 
                 //  прогресс
-                if (i % Math.Max(1, totalPixels / 100) == 0)
+                if (totalPixels > 0)
                 {
-                    progress?.Report(Math.Min(100, i * 100 / totalPixels ));
+                    int progress = (i * 100) / (totalPixels - 1); // Учитываем, что последний индекс totalPixels - 1
+                    progress = Math.Max(0, Math.Min(100, progress)); // Ограничиваем в диапазоне [0, 100]
+                    OnProgressChanged(progress); // Вызываем событие
                 }
 
             }
 
             image.UnlockBits(inputData);
 
-            progress?.Report(100);
+            OnProgressChanged(100);
 
             Marshal.Copy(pixelBuffer, 0, outputData.Scan0, bytes);
             convertedImage.UnlockBits(outputData);
@@ -80,19 +85,16 @@ namespace TestTask_ConvertRGBToBW
             return convertedImage;
         }
 
-        public async Task<Bitmap> ConvertAndSaveAsync(Bitmap image, System.Windows.Forms.ProgressBar progressBar)
+        protected virtual void OnProgressChanged(int progress)
         {
-            var progress = new Progress<int>(value =>
-            {
-                progressBar.Value = value; // Обновляем прогресс-бар в UI
-            });
+            ProgressChanged?.Invoke(this, progress);
+        }
 
-            return await Task.Run(() =>
-            {
-                Bitmap outputImage = Convert(image, progress);
+        public async Task<Bitmap> ConvertAndSaveAsync(Bitmap image)
+        { 
+                Bitmap outputImage = Convert(image);
                 outputImage.Save(NameOut, ImageFormat.Png); // Сохраняем в PNG
                 return outputImage;
-            });
         }
 
     }
