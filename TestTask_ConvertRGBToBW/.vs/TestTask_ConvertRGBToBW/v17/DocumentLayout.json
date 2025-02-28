@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "E:\\\u0420\u0430\u0431\u043E\u0442\u0430\\Convert_RGBToBW\\TestTask_ConvertRGBToBW\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{671A09F2-B801-477E-BA8C-64A78A51EBF6}|TestTask_ConvertRGBToBW\\TestTask_ConvertRGBToBW.csproj|e:\\\u0440\u0430\u0431\u043E\u0442\u0430\\convert_rgbtobw\\testtask_convertrgbtobw\\testtask_convertrgbtobw\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{671A09F2-B801-477E-BA8C-64A78A51EBF6}|TestTask_ConvertRGBToBW\\TestTask_ConvertRGBToBW.csproj|solutionrelative:testtask_convertrgbtobw\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{671A09F2-B801-477E-BA8C-64A78A51EBF6}|TestTask_ConvertRGBToBW\\TestTask_ConvertRGBToBW.csproj|e:\\\u0440\u0430\u0431\u043E\u0442\u0430\\convert_rgbtobw\\testtask_convertrgbtobw\\testtask_convertrgbtobw\\imagergbtobw.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{671A09F2-B801-477E-BA8C-64A78A51EBF6}|TestTask_ConvertRGBToBW\\TestTask_ConvertRGBToBW.csproj|solutionrelative:testtask_convertrgbtobw\\imagergbtobw.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{671A09F2-B801-477E-BA8C-64A78A51EBF6}|TestTask_ConvertRGBToBW\\TestTask_ConvertRGBToBW.csproj|e:\\\u0440\u0430\u0431\u043E\u0442\u0430\\convert_rgbtobw\\testtask_convertrgbtobw\\testtask_convertrgbtobw\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{671A09F2-B801-477E-BA8C-64A78A51EBF6}|TestTask_ConvertRGBToBW\\TestTask_ConvertRGBToBW.csproj|solutionrelative:testtask_convertrgbtobw\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{671A09F2-B801-477E-BA8C-64A78A51EBF6}|TestTask_ConvertRGBToBW\\TestTask_ConvertRGBToBW.csproj|E:\\\u0420\u0430\u0431\u043E\u0442\u0430\\Convert_RGBToBW\\TestTask_ConvertRGBToBW\\testtask_convertrgbtobw\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
@@ -26,13 +26,13 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Form1.cs",
               "DocumentMoniker": "E:\\\u0420\u0430\u0431\u043E\u0442\u0430\\Convert_RGBToBW\\TestTask_ConvertRGBToBW\\TestTask_ConvertRGBToBW\\Form1.cs",
               "RelativeDocumentMoniker": "TestTask_ConvertRGBToBW\\Form1.cs",
               "ToolTip": "E:\\\u0420\u0430\u0431\u043E\u0442\u0430\\Convert_RGBToBW\\TestTask_ConvertRGBToBW\\TestTask_ConvertRGBToBW\\Form1.cs",
               "RelativeToolTip": "TestTask_ConvertRGBToBW\\Form1.cs",
-              "ViewState": "AQIAACoAAAAAAAAAAIA7wEgAAAAdAAAA",
+              "ViewState": "AQIAACsAAAAAAAAAAAAlwEgAAAAdAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-02-27T15:21:09.057Z",
               "EditorCaption": ""
@@ -56,13 +56,13 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "ImageRGBToBW.cs",
               "DocumentMoniker": "E:\\\u0420\u0430\u0431\u043E\u0442\u0430\\Convert_RGBToBW\\TestTask_ConvertRGBToBW\\TestTask_ConvertRGBToBW\\ImageRGBToBW.cs",
               "RelativeDocumentMoniker": "TestTask_ConvertRGBToBW\\ImageRGBToBW.cs",
               "ToolTip": "E:\\\u0420\u0430\u0431\u043E\u0442\u0430\\Convert_RGBToBW\\TestTask_ConvertRGBToBW\\TestTask_ConvertRGBToBW\\ImageRGBToBW.cs",
               "RelativeToolTip": "TestTask_ConvertRGBToBW\\ImageRGBToBW.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABsAAAAYAAAA",
+              "ViewState": "AQIAACIAAAAAAAAAAAAAAEQAAAAcAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-02-27T16:44:46.214Z",
               "EditorCaption": ""

@@ -38,7 +38,7 @@ namespace TestTask_ConvertRGBToBW
             if (format != PixelFormat.Format24bppRgb && format != PixelFormat.Format32bppArgb)
                 throw new NotSupportedException("Поддерживаются только 24-битные и 32-битные изображения.");
 
-            Bitmap convertedImage = new Bitmap(image.Width, image.Height, format);
+            Bitmap convertedImage = new Bitmap(image.Width, image.Height, PixelFormat.Format1bppIndexed);
 
             BitmapData inputData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height),
                                                   ImageLockMode.ReadOnly, format);
@@ -58,14 +58,13 @@ namespace TestTask_ConvertRGBToBW
             for (int i = 0; i < pixelBuffer.Length; i += pixelSize)
             {
                 // Вычисляем яркость 
-                byte grayValue = (byte)((pixelBuffer[i] + pixelBuffer[i + 1] + pixelBuffer[i + 2]) / 3);
+                byte brightness = (byte)((pixelBuffer[i] + pixelBuffer[i + 1] + pixelBuffer[i + 2]) / 3);
 
                 // Бинаризация
-                byte binaryValue = (grayValue >= Threshold) ? (byte)255 : (byte)0;
+                byte binaryValue = (brightness >= Threshold) ? (byte)255 : (byte)0;
 
-                pixelBuffer[i] = binaryValue;     // Blue
-                pixelBuffer[i + 1] = binaryValue; // Green
-                pixelBuffer[i + 2] = binaryValue; // Red
+                pixelBuffer[i] = binaryValue;     
+                
 
                 //  прогресс
                 if (totalPixels > 0)
