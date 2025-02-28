@@ -21,6 +21,8 @@ namespace TestTask_ConvertRGBToBW
 
         public event EventHandler<int> ProgressChanged;
 
+        public event EventHandler<Bitmap> ImageUpdated;
+
         public ImageRGBToBW(string link, string nameOut = "output.png")
         {
             Link = link;
@@ -68,8 +70,8 @@ namespace TestTask_ConvertRGBToBW
                 //  прогресс
                 if (totalPixels > 0)
                 {
-                    int progress = (i * 100) / (totalPixels - 1); // Учитываем, что последний индекс totalPixels - 1
-                    progress = Math.Max(0, Math.Min(100, progress)); // Ограничиваем в диапазоне [0, 100]
+                    int progress = (i * 100) / (totalPixels - 1); 
+                    progress = Math.Max(0, Math.Min(100, progress)); 
                     OnProgressChanged(progress); // Вызываем событие
                 }
 
@@ -77,6 +79,7 @@ namespace TestTask_ConvertRGBToBW
 
             image.UnlockBits(inputData);
 
+            //100% прогресс
             OnProgressChanged(100);
 
             Marshal.Copy(pixelBuffer, 0, outputData.Scan0, bytes);
@@ -90,11 +93,12 @@ namespace TestTask_ConvertRGBToBW
             ProgressChanged?.Invoke(this, progress);
         }
 
-        public async Task<Bitmap> ConvertAndSaveAsync(Bitmap image)
+        public async Task ConvertAndSaveAsync(Bitmap image)
         { 
-                Bitmap outputImage = Convert(image);
-                outputImage.Save(NameOut, ImageFormat.Png); // Сохраняем в PNG
-                return outputImage;
+            Bitmap outputImage = Convert(image);
+            ImageUpdated?.Invoke(this, outputImage);
+            /*outputImage.Save(NameOut, ImageFormat.Png); */// Сохраняем в PNG
+            
         }
 
     }

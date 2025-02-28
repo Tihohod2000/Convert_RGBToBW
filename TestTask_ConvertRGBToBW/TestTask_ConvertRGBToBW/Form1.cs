@@ -53,7 +53,7 @@ namespace TestTask_ConvertRGBToBW
 
                     converter.ProgressChanged += (s, progress) =>
                     {
-                        // Используем Invoke
+                        // Подписка на событие InvokeRequired
                         if (progressBar1.InvokeRequired)
                         {
                             progressBar1.Invoke(new Action<int>((p) => progressBar1.Value = p), progress);
@@ -63,12 +63,27 @@ namespace TestTask_ConvertRGBToBW
                             progressBar1.Value = progress;
                         }
                     };
-                    Bitmap bwImage = await converter.ConvertAndSaveAsync(inputImage);
+
+                    // Подписка на событие ImageUpdated
+                    converter.ImageUpdated += (s, updatedImage) =>
+                    {
+                        if (pictureOutput.InvokeRequired)
+                        {
+                            pictureOutput.Invoke(new Action(() =>
+                            {
+                                pictureOutput.Image = updatedImage;
+                                pictureOutput.SizeMode = PictureBoxSizeMode.Zoom;
+                            }));
+                        }
+                        else
+                        {
+                            pictureOutput.Image = updatedImage;
+                            pictureOutput.SizeMode = PictureBoxSizeMode.Zoom;
+                        }
+                    };
+
+                    await converter.ConvertAndSaveAsync(inputImage);
                     Console.WriteLine("Конец");
-
-                    pictureOutput.Image = bwImage;
-                    pictureOutput.SizeMode = PictureBoxSizeMode.Zoom;
-
 
                 }
                 catch (Exception ex)
