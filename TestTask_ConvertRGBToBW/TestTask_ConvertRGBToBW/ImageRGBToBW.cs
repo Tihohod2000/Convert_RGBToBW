@@ -23,6 +23,8 @@ namespace TestTask_ConvertRGBToBW
 
         public event EventHandler<Bitmap> ImageUpdated;
 
+        public Bitmap outputImage;
+
         public ImageRGBToBW(string link, string nameOut = "output.png")
         {
             Link = link;
@@ -94,10 +96,22 @@ namespace TestTask_ConvertRGBToBW
 
         public async Task ConvertAndSaveAsync(Bitmap image)
         { 
-            Bitmap outputImage = Convert(image);
+            outputImage = Convert(image);
             ImageUpdated?.Invoke(this, outputImage);
             /*outputImage.Save(NameOut, ImageFormat.Png); */// Сохраняем в PNG
             
+        }
+
+        public void SaveImage(string NameOut)
+        {
+            if (outputImage != null)
+            {
+                outputImage.Save(NameOut, ImageFormat.Png);
+            }
+            else
+            {
+                throw new NotSupportedException("Изображение не было сконвертированно");
+            }
         }
 
     }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Resources.ResXFileRef;
 using static System.Windows.Forms.LinkLabel;
 
 namespace TestTask_ConvertRGBToBW
@@ -21,7 +22,9 @@ namespace TestTask_ConvertRGBToBW
         public string ImagePath;
 
         public Bitmap inputImage;
-        OpenFileDialog openFileDialog = new OpenFileDialog();
+
+        public OpenFileDialog openFileDialog = new OpenFileDialog();
+        public ImageRGBToBW converter;
 
         private void button2_Click(object sender, EventArgs e)
         {
@@ -48,7 +51,7 @@ namespace TestTask_ConvertRGBToBW
 
                 try
                 {
-                    ImageRGBToBW converter = new ImageRGBToBW(ImagePath);
+                     converter = new ImageRGBToBW(ImagePath);
                     /*converter.ConvertAndSave(inputImage);*/
 
                     converter.ProgressChanged += (s, progress) =>
@@ -93,10 +96,7 @@ namespace TestTask_ConvertRGBToBW
                     MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
-
-
-
-                MessageBox.Show("Готово!");
+                //MessageBox.Show("Готово!");
             }
             else
             {
@@ -107,6 +107,43 @@ namespace TestTask_ConvertRGBToBW
         private void ExitApp(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (converter == null)
+                {
+                    throw new NotSupportedException("Изображение не было сконвертированно");
+                }
+
+                using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+                {
+                    saveFileDialog.Title = "Выберите место для сохранения";
+                    saveFileDialog.Filter = "Изображения (*.jpg;*.png)|*.jpg;*.png|Все файлы (*.*)|*.*";
+                    saveFileDialog.FileName = "image.jpg"; // Имя по умолчанию
+
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string filePath = saveFileDialog.FileName;
+
+                        converter.SaveImage(filePath);
+                        MessageBox.Show($"Файл был успешно сохранён");
+
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            
+
+
+
         }
     }
 }
