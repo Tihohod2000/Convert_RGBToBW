@@ -19,13 +19,19 @@ namespace TestTask_ConvertRGBToBW
 
         private const byte Threshold = 128; // Порог
 
+        public event EventHandler<int> ProgressChanged;
+
+        public event EventHandler<Bitmap> ImageUpdated;
+
+        public Bitmap outputImage;
+
         public ImageRGBToBW(string link, string nameOut = "output.png")
         {
             Link = link;
             NameOut = nameOut;
         }
 
-        public Bitmap Convert(Bitmap image, IProgress<int> progress)
+        public Bitmap Convert(Bitmap image)
         {
             if (image == null)
                 throw new ArgumentNullException(nameof(image), "Изображение не может быть null");
@@ -34,7 +40,7 @@ namespace TestTask_ConvertRGBToBW
             if (format != PixelFormat.Format24bppRgb && format != PixelFormat.Format32bppArgb)
                 throw new NotSupportedException("Поддерживаются только 24-битные и 32-битные изображения.");
 
-            Bitmap convertedImage = new Bitmap(image.Width, image.Height, format);
+            Bitmap convertedImage = new Bitmap(image.Width, image.Height, PixelFormat.Format1bppIndexed);
 
             BitmapData inputData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height),
                                                   ImageLockMode.ReadOnly, format);
@@ -50,29 +56,32 @@ namespace TestTask_ConvertRGBToBW
             int pixelSize = (format == PixelFormat.Format24bppRgb) ? 3 : 4; // 3 байта (BGR) или 4 (BGRA)
             int totalPixels = pixelBuffer.Length / pixelSize;
 
+
             for (int i = 0; i < pixelBuffer.Length; i += pixelSize)
             {
                 // Вычисляем яркость 
-                byte grayValue = (byte)((pixelBuffer[i] + pixelBuffer[i + 1] + pixelBuffer[i + 2]) / 3);
+                byte brightness = (byte)((pixelBuffer[i] + pixelBuffer[i + 1] + pixelBuffer[i + 2]) / 3);
 
                 // Бинаризация
-                byte binaryValue = (grayValue >= Threshold) ? (byte)255 : (byte)0;
+                byte binaryValue = (brightness >= Threshold) ? (byte)255 : (byte)0;
 
-                pixelBuffer[i] = binaryValue;     // Blue
-                pixelBuffer[i + 1] = binaryValue; // Green
-                pixelBuffer[i + 2] = binaryValue; // Red
+                pixelBuffer[i] = binaryValue;     
+                
 
                 //  прогресс
-                if (i % Math.Max(1, totalPixels / 100) == 0)
+                if (totalPixels > 0)
                 {
-                    progress?.Report(Math.Min(100, i * 100 / totalPixels ));
+                    int progress = (i * 100) / (totalPixels - 1); 
+                    progress = Math.Max(0, Math.Min(100, progress)); 
+                    OnProgressChanged(progress); // Вызываем событие
                 }
 
             }
 
             image.UnlockBits(inputData);
 
-            progress?.Report(100);
+            //100% прогресс
+            OnProgressChanged(100);
 
             Marshal.Copy(pixelBuffer, 0, outputData.Scan0, bytes);
             convertedImage.UnlockBits(outputData);
@@ -80,19 +89,29 @@ namespace TestTask_ConvertRGBToBW
             return convertedImage;
         }
 
-        public async Task<Bitmap> ConvertAndSaveAsync(Bitmap image, System.Windows.Forms.ProgressBar progressBar)
+        protected virtual void OnProgressChanged(int progress)
         {
-            var progress = new Progress<int>(value =>
-            {
-                progressBar.Value = value; // Обновляем прогресс-бар в UI
-            });
+            ProgressChanged?.Invoke(this, progress);
+        }
 
-            return await Task.Run(() =>
+        public async Task ConvertAndSaveAsync(Bitmap image)
+        { 
+            outputImage = Convert(image);
+            ImageUpdated?.Invoke(this, outputImage);
+            /*outputImage.Save(NameOut, ImageFormat.Png); */// Сохраняем в PNG
+            
+        }
+
+        public void SaveImage(string NameOut)
+        {
+            if (outputImage != null)
             {
-                Bitmap outputImage = Convert(image, progress);
-                outputImage.Save(NameOut, ImageFormat.Png); // Сохраняем в PNG
-                return outputImage;
-            });
+                outputImage.Save(NameOut, ImageFormat.Png);
+            }
+            else
+            {
+                throw new NotSupportedException("Изображение не было сконвертированно");
+            }
         }
 
     }

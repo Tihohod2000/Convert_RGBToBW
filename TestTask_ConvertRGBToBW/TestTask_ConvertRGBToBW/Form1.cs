@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Resources.ResXFileRef;
 using static System.Windows.Forms.LinkLabel;
 
 namespace TestTask_ConvertRGBToBW
@@ -18,10 +19,12 @@ namespace TestTask_ConvertRGBToBW
             InitializeComponent();
         }
 
-        public string selectedFilePath;
+        public string ImagePath;
 
         public Bitmap inputImage;
-        OpenFileDialog openFileDialog = new OpenFileDialog();
+
+        public OpenFileDialog openFileDialog = new OpenFileDialog();
+        public ImageRGBToBW converter;
 
         private void button2_Click(object sender, EventArgs e)
         {
@@ -31,18 +34,11 @@ namespace TestTask_ConvertRGBToBW
             // Проверяем, выбрал ли пользователь файл
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                // Получаем путь к выбранному файлу
-                selectedFilePath = openFileDialog.FileName;
+                ImagePath = openFileDialog.FileName;
 
-                //Загружаем изображение
-                inputImage = new Bitmap(selectedFilePath);
+                inputImage = new Bitmap(ImagePath);;
 
-                // Например, выводим путь в текстовое поле
-                // MessageBox.Show("Вы выбрали файл: " + selectedFilePath);
-
-                // Загрузка изображения в PictureBox
-                pictureInput.Image = Image.FromFile(selectedFilePath);
-
+                pictureInput.Image = Image.FromFile(ImagePath);
                 pictureInput.SizeMode = PictureBoxSizeMode.Zoom;
             }
         }
@@ -50,30 +46,103 @@ namespace TestTask_ConvertRGBToBW
         private async void button1_Click(object sender, EventArgs e)
         {
             // Проверяем, выбрал ли пользователь файл
-            if (!string.IsNullOrEmpty(selectedFilePath))
+            if (!string.IsNullOrEmpty(ImagePath))
             {
-                ImageRGBToBW converter = new ImageRGBToBW(selectedFilePath);
-                /*converter.ConvertAndSave(inputImage);*/
 
-                Bitmap bwImage = await converter.ConvertAndSaveAsync(inputImage, progressBar1);
-                Console.WriteLine("Конец");
+                try
+                {
+                     converter = new ImageRGBToBW(ImagePath);
+                    /*converter.ConvertAndSave(inputImage);*/
 
-                pictureOutput.Image = bwImage;
+                    converter.ProgressChanged += (s, progress) =>
+                    {
+                        // Подписка на событие InvokeRequired
+                        if (progressBar1.InvokeRequired)
+                        {
+                            progressBar1.Invoke(new Action<int>((p) => progressBar1.Value = p), progress);
+                        }
+                        else
+                        {
+                            progressBar1.Value = progress;
+                        }
+                    };
 
-                pictureOutput.SizeMode = PictureBoxSizeMode.Zoom;
+                    // Подписка на событие ImageUpdated
+                    converter.ImageUpdated += (s, updatedImage) =>
+                    {
+                        if (pictureOutput.InvokeRequired)
+                        {
+                            pictureOutput.Invoke(new Action(() =>
+                            {
+                                pictureOutput.Image = updatedImage;
+                                pictureOutput.SizeMode = PictureBoxSizeMode.Zoom;
+                            }));
+                        }
+                        else
+                        {
+                            pictureOutput.Image = updatedImage;
+                            pictureOutput.SizeMode = PictureBoxSizeMode.Zoom;
+                        }
+                    };
 
-                /*MessageBox.Show("Готово!");*/
+                    await converter.ConvertAndSaveAsync(inputImage);
+                    Console.WriteLine("Конец");
+
+                }
+                catch (Exception ex)
+                {
+
+                    Console.WriteLine($"Ошибка: {ex.Message}");
+                    MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+                //MessageBox.Show("Готово!");
             }
             else
             {
                 MessageBox.Show("Выберите изображение!!!");
             }
+        }
 
+        private void ExitApp(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (converter == null)
+                {
+                    throw new NotSupportedException("Изображение не было сконвертированно");
+                }
+
+                using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+                {
+                    saveFileDialog.Title = "Выберите место для сохранения";
+                    saveFileDialog.Filter = "Изображения (*.jpg;*.png)|*.jpg;*.png|Все файлы (*.*)|*.*";
+                    saveFileDialog.FileName = "image.jpg"; // Имя по умолчанию
+
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string filePath = saveFileDialog.FileName;
+
+                        converter.SaveImage(filePath);
+                        MessageBox.Show($"Файл был успешно сохранён");
+
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             
 
-            /*pictureOutput.Image = Image.FromFile(selectedFilePath);
 
-            pictureOutput.SizeMode = PictureBoxSizeMode.Zoom;*/
 
         }
     }
