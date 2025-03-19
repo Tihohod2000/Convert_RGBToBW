@@ -45,46 +45,58 @@ namespace TestTask_ConvertRGBToBW
             BitmapData inputData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height),
                                                   ImageLockMode.ReadOnly, format);
             BitmapData outputData = convertedImage.LockBits(new Rectangle(0, 0, convertedImage.Width, convertedImage.Height),
-                                                            ImageLockMode.WriteOnly, format);
+                                                            ImageLockMode.WriteOnly, PixelFormat.Format1bppIndexed);
 
-            int bytes = Math.Abs(inputData.Stride) * image.Height;
-            byte[] pixelBuffer = new byte[bytes];
+            int width = image.Width;
+            int height = image.Height;
+            int stride = inputData.Stride;
+            int pixelSize = (format == PixelFormat.Format24bppRgb) ? 3 : 4;
 
-            Marshal.Copy(inputData.Scan0, pixelBuffer, 0, bytes);
-            
+            int totalRows = height;
+            int processedRows = 0;
 
-            int pixelSize = (format == PixelFormat.Format24bppRgb) ? 3 : 4; // 3 байта (BGR) или 4 (BGRA)
-            int totalPixels = pixelBuffer.Length / pixelSize;
-
-
-            for (int i = 0; i < pixelBuffer.Length; i += pixelSize)
+            unsafe
             {
-                // Вычисляем яркость 
-                byte brightness = (byte)((pixelBuffer[i] + pixelBuffer[i + 1] + pixelBuffer[i + 2]) / 3);
+                byte* inputPtr = (byte*)inputData.Scan0;
+                byte* outputPtr = (byte*)outputData.Scan0;
 
-                // Бинаризация
-                byte binaryValue = (brightness >= Threshold) ? (byte)255 : (byte)0;
-
-                pixelBuffer[i] = binaryValue;     
-                
-
-                //  прогресс
-                if (totalPixels > 0)
+                Parallel.For(0, height, y =>
                 {
-                    int progress = (i * 100) / (totalPixels - 1); 
-                    progress = Math.Max(0, Math.Min(100, progress)); 
-                    OnProgressChanged(progress); // Вызываем событие
-                }
+                    byte* rowInput = inputPtr + y * stride;
+                    byte* rowOutput = outputPtr + (y * outputData.Stride);
 
+                    byte pixelByte = 0;
+                    int bitIndex = 7;
+
+                    for (int x = 0; x < width; x++)
+                    {
+                        byte brightness = (byte)((rowInput[x * pixelSize] + rowInput[x * pixelSize + 1] + rowInput[x * pixelSize + 2]) / 3);
+                        if (brightness >= Threshold)
+                            pixelByte |= (byte)(1 << bitIndex);
+
+                        bitIndex--;
+
+                        if (bitIndex < 0 || x == width - 1)
+                        {
+                            rowOutput[x / 8] = pixelByte;
+                            pixelByte = 0;
+                            bitIndex = 7;
+                        }
+                    }
+
+                    // Обновление прогресса раз в 10 строк
+                    if (Interlocked.Increment(ref processedRows) % 10 == 0)
+                    {
+                        int progress = (processedRows * 100) / totalRows;
+                        ProgressChanged?.Invoke(this, progress);
+                    }
+                });
             }
 
             image.UnlockBits(inputData);
-
-            //100% прогресс
-            OnProgressChanged(100);
-
-            Marshal.Copy(pixelBuffer, 0, outputData.Scan0, bytes);
             convertedImage.UnlockBits(outputData);
+
+            ProgressChanged?.Invoke(this, 100);
 
             return convertedImage;
         }
@@ -96,7 +108,7 @@ namespace TestTask_ConvertRGBToBW
 
         public async Task ConvertAndSaveAsync(Bitmap image)
         { 
-            outputImage = Convert(image);
+            outputImage = await Task.Run(() => Convert(image));
             ImageUpdated?.Invoke(this, outputImage);
             /*outputImage.Save(NameOut, ImageFormat.Png); */// Сохраняем в PNG
             
